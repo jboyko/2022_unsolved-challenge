@@ -2,17 +2,20 @@
 title: "A brief introduction to character independent HMMs when testing for correlation"
 author: "James D. Boyko"
 date: "31/03/2022"
-output: html_document
+output:
+  pdf_document: default
+  html_document: default
 ---
 
 ```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = TRUE)
 set.seed(1985)
 require(corHMM)
 require(geiger)
 require(ggplot2)
 require(gridExtra)
 require(phytools)
+require(formatR)
+knitr::opts_chunk$set(echo = TRUE, tidy.opts = list(width.cutoff = 60), tidy = TRUE)
 ```
 
 ## Background
@@ -23,9 +26,9 @@ A character is defined as a general property of the organism that can have alter
 
 Typically comparative analyses which aimed to test for correlation between discrete characters have used the framework of Pagel (1994). This means fitting two models: one in which change in character X and character Y are dependent on each other and one in which the changes in each character are independent of one another. To determine whether a model says the characters "depend" on one another let us first define our model for two binary characters. 
 
+$$F = flower\ color\ where,\ 0=red\ \&\ 1=white\\$$
+$$S = scent\ where,\ 0=unscented\ \&\ 1=scented\\$$
 $$
-F = flower\ color\ where,\ 0=red\ \&\ 1=white\\
-S = scent\ where,\ 0=unscented\ \&\ 1=scented\\
 \begin{bmatrix} 
 - & F_{0}S_{0} \rightarrow F_{0}S_{1} & F_{0}S_{0} \rightarrow F_{1}S_{0} & -\\ 
 - & - & - & -\\ 
@@ -36,9 +39,9 @@ $$
 
 Each element of the matrix above represents a potential transition between the combined states of our characters. Shown above is the first row which describes the possible transitions for a red flower ($F_0$) that is currently unscented ($S_0$). It can either transition to being scented ($S_1$) or become a white flower ($F_1$). Finally, there is also the possibility of a direct transition to being a white and scented flower, but since we are interested in character dependence we need to test whether the most likely pathways between states are in line with character dependence or independence and the presence of dual transitions would make that comparison impossible (see Boyko and Beaulieu, in prep.). The full matrix, with all possible transitions looks like this:
 
+$$F = flower\ color\ where,\ 0=red\ \&\ 1=white\\$$
+$$S = scent\ where,\ 0=unscented\ \&\ 1=scented\\$$
 $$
-F = flower\ color\ where,\ 0=red\ \&\ 1=white\\
-S = scent\ where,\ 0=unscented\ \&\ 1=scented\\
 \begin{bmatrix} 
 - & F_{0}S_{0} \rightarrow F_{0}S_{1} & F_{0}S_{0} \rightarrow F_{1}S_{0} & -\\ 
 F_{0}S_{1} \rightarrow F_{0}S_{0} & - & - & F_{0}S_{1} \rightarrow F_{1}S_{1} \\ 
@@ -49,9 +52,9 @@ $$
 
 Testing for dependence in the most general sense comes down to determining whether transitions in a focal character depend on the state of the background character. For example, if the transition from red to white flower depends on whether it is scented or unscented, we expect that transitions in our focal character (flower color) will depend on the state of our background character (scent). In the matrix below, we will focus on whether two transition rates are equal or different:
 
+$$F = flower\ color\ where,\ 0=red\ \&\ 1=white\\$$
+$$S = scent\ where,\ 0=unscented\ \&\ 1=scented\\$$
 $$
-F = flower\ color\ where,\ 0=red\ \&\ 1=white\\
-S = scent\ where,\ 0=unscented\ \&\ 1=scented\\
 \begin{bmatrix} 
 - & - & F_{0}S_{0} \rightarrow F_{1}S_{0} & -\\ 
 - & - & - & F_{0}S_{1} \rightarrow F_{1}S_{1} \\ 
@@ -118,7 +121,7 @@ independent_model_matrix
 
 In this case, 1 = 00 is red unscented flowers, 2 = 01 is red scented flowers, 3 = 10 is white unscented flowers, and 4 = 11 is white scented flowers. If you examine the matrices you will see that under a independent model, changes in a focal character do not depend on the background state of the other character. For example, parameter 2 is equal for transitions from $(1) \rightarrow (3)$ and $(2) \rightarrow (4)$ which represents the transition for red unscented flowers to white unscented flowers and red scented flowers to white scented flowers. The only character changing in this transition is flower color (from red to white) and by setting these parameters to be equal, we are saying the state of the background character (presence or abscence of scent) does not influence the rate of that transition.
 
-```{r, cache=TRUE}
+```{r cache=TRUE}
 dependent_model_fit <- corHMM(phy, dat, rate.cat = 1, rate.mat = dependent_model_matrix, node.states = "none", collapse = FALSE)
 independent_model_fit <- corHMM(phy, dat, rate.cat = 1, rate.mat = independent_model_matrix, node.states = "none", collapse = FALSE)
 c(AIC_dependent_model = dependent_model_fit$AIC, AIC_independent_model = independent_model_fit$AIC)
