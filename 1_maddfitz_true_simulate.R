@@ -57,7 +57,7 @@ fit_model_set <- function(phy, dat, collapsed=TRUE){
   # correlated models
   rate_mat_cor <- rate.mat
   rate_mat_cor_2 <- getFullMat(list(rate_mat_cor, rate_mat_cor), equateStateMatPars(getRateCatMat(2), 1:2))
-  rate_mat_simp_cor <- equateStateMatPars(rate_mat_cor, list(c(1,3),c(2,5), c(4,7), c(6,8)))
+  rate_mat_simp_cor <- equateStateMatPars(rate_mat_cor, list(c(1,3,2,5), c(4,7,6,8)))
   rate_mat_simp_cor_2 <- getFullMat(list(rate_mat_simp_cor, rate_mat_simp_cor), equateStateMatPars(getRateCatMat(2), 1:2))
   # fit single rate models
   fit_independent <- corHMM(phy, data = dat, rate.cat = 1, rate.mat = rate_mat_ind, collapse = FALSE)
